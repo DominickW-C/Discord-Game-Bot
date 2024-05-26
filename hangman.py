@@ -15,6 +15,7 @@ for line in cache:
 #refreshes the text document and puts it in write mode
 def reopen():
     global cache
+    cache.close()
     os.remove("hangmanCache.txt")
     cache = open("hangmanCache.txt", "w")
 
