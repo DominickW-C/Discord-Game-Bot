@@ -110,6 +110,7 @@ def hangmanOutput():
     for line in readCache:
         txtData.append(line.rstrip())
 
+    readCache.close()
     #checks if you can still play or not
     if chances == 6:
         out = f"Game Over!\n\nThe word was: {txtData[3]}\n\n{man()}"
