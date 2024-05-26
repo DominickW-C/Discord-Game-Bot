@@ -22,16 +22,18 @@ def reopen():
 pickedWord = storeRead[0]
 currentWord = storeRead[1]
 lettersGuessed = storeRead[2]
+pickedUnchanged = storeRead[3]
 rightWrong = ""
 chances = 0
 
 #creates/refreshes the game
 def create():
-    global pickedWord, currentWord, lettersGuessed, chances
+    global pickedWord, currentWord, lettersGuessed, chances, rightWrong, pickedUnchanged
     
     #resets file
     reopen()
     chances = 0
+    rightWrong = ""
 
     #chooses random word
     wordsFile = open("words.txt", "r")
@@ -39,13 +41,14 @@ def create():
     for line in wordsFile:
         wordsList.append(line.rstrip())
     pickedWord = wordsList[random.randint(0, len(wordsList) - 1)]
+    pickedUnchanged = pickedWord
     
     #set current word to blank, and empties letters guessed
     currentWord = ("-" * len(pickedWord))
     lettersGuessed = "guessed: "
     
     #writes to text doc and closes
-    cache.write(f'''{pickedWord}\n{currentWord}\n{lettersGuessed}''')
+    cache.write(f'''{pickedWord}\n{currentWord}\n{lettersGuessed}\n{pickedUnchanged}''')
     cache.close()
 
 #changes the letter to a -, recursively calls itself to fill in duplicates
@@ -91,7 +94,7 @@ def guess(letter):
         chances += 1
 
     #writes to text doc
-    cache.write(f'''{pickedWord}\n{currentWord}\n{lettersGuessed}''')
+    cache.write(f'''{pickedWord}\n{currentWord}\n{lettersGuessed}\n{pickedUnchanged}''')
     cache.close()
 
 def hangmanOutput():
@@ -108,12 +111,24 @@ def hangmanOutput():
 
     #checks if you can still play or not
     if chances == 6:
-        out = f"Game Over!\n\n{man()}"
+        out = f"Game Over!\n\nThe word was: {txtData[3]}\n\n{man()}"
         create()
         chances = 0 
         return out
     else:
-        return f'''{rightWrong}\n\ncurrent word:\n{txtData[1]}\n\n{txtData[2]}\n\n{man()}'''
+        #Checks if you won yet
+        correct = True
+        for letter in txtData[1]:
+             if letter == "-":
+                  correct = False
+                  break
+        if correct == True:
+             winOut = f"You win!\nThe word was: {txtData[1]}\n\n{man()}"
+             create()
+             chances = 0
+             return winOut
+        else:
+            return f'''{rightWrong}\n\ncurrent word:\n{txtData[1]}\n\n{txtData[2]}\n\n{man()}'''
 
 #man art
 def man():
